@@ -13,7 +13,18 @@ class Product {
     this.featuredImage,
     this.status,
     this.createdAt,
+    this.inCart = false,
   });
+
+  int? id;
+  String? slug;
+  String? title;
+  String? description;
+  int? price;
+  String? featuredImage;
+  String? status;
+  String? createdAt;
+  bool inCart = false;
 
   Product.fromJson(dynamic json) {
     id = json['id'];
@@ -25,14 +36,7 @@ class Product {
     status = json['status'];
     createdAt = json['created_at'];
   }
-  int? id;
-  String? slug;
-  String? title;
-  String? description;
-  int? price;
-  String? featuredImage;
-  String? status;
-  String? createdAt;
+
   Product copyWith({
     int? id,
     String? slug,

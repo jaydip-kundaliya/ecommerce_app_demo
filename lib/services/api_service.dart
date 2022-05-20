@@ -20,8 +20,8 @@ class ApiService {
     final List<Product> products = [];
     final response = await _apiService.get(ApiKeys.productListEndPoint);
     if (response.statusCode == 200) {
-      var data = json.decode(response.data);
-      for (final result in data.length) {
+      var data = json.decode(response.data)['data'];
+      for (final result in data) {
         products.add(Product.fromJson(result));
       }
       return products;
