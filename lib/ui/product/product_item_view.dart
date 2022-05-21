@@ -1,3 +1,4 @@
+import 'package:ecommerce_app_demo/ui/product/products_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -18,6 +19,7 @@ class ProductItemView extends StatefulWidget {
 
 class _ProductItemViewState extends State<ProductItemView> {
   bool productInCart = false;
+  int productQuatity = 0;
 
   @override
   void initState() {
@@ -59,7 +61,9 @@ class _ProductItemViewState extends State<ProductItemView> {
                 ),
                 IconButton(
                   onPressed: () {
-                    _addProductToCart();
+                    _enableQuantitySheet(context).then(
+                      (value) => setState(() {}),
+                    );
                   },
                   focusColor: Colors.transparent,
                   icon: Icon(
@@ -76,9 +80,124 @@ class _ProductItemViewState extends State<ProductItemView> {
     );
   }
 
+  Future<void> _enableQuantitySheet(BuildContext context) async {
+    await showModalBottomSheet(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Padding(
+          padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.product.title ?? '',
+                      style: AppTextStyle.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () async {
+                      await _removeProductFromCart();
+                      productInCart = productIsInCart();
+                    },
+                    icon: const Icon(
+                      Icons.delete,
+                      size: 30,
+                    ),
+                  )
+                ],
+              ),
+              Text(
+                widget.product.description ?? '',
+                style: AppTextStyle.poppins(
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        CircleAvatar(
+                          child: IconButton(
+                            onPressed: () {
+                              if (productQuatity > 0) {
+                                productQuatity--;
+                                setState(() {});
+                              }
+                            },
+                            icon: const Icon(Icons.remove),
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        Text(
+                          productQuatity.toString(),
+                          style: AppTextStyle.poppins(
+                            fontSize: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        CircleAvatar(
+                          child: IconButton(
+                            onPressed: () {
+                              productQuatity++;
+                              setState(() {});
+                            },
+                            icon: const Icon(Icons.add),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: IconButton(
+                        onPressed: () async {
+                          await _addProductToCart();
+                          productInCart = productIsInCart();
+                        },
+                        icon: const Icon(Icons.check),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _addProductToCart() async {
-    await GetIt.I.get<LocalPrefService>().addProductToCart(widget.product);
-    setState(() {});
+    final newProduct = widget.product.updateQuatity(productQuatity);
+    if (productQuatity > 0) {
+      await GetIt.I.get<LocalPrefService>().addProductToCart(newProduct);
+    } else {
+      _removeProductFromCart();
+    }
+    ProductsView.productsViewState.currentState?.updateCartBadge();
+    ProductsView.productsViewState.currentState?.setState(() {});
+    Navigator.of(context).maybePop();
+  }
+
+  Future<void> _removeProductFromCart() async {
+    await GetIt.I.get<LocalPrefService>().deleteProductToCart(widget.product);
+    ProductsView.productsViewState.currentState?.updateCartBadge();
+    ProductsView.productsViewState.currentState?.setState(() {});
+    Navigator.of(context).maybePop();
   }
 
   bool productIsInCart() {
@@ -86,6 +205,7 @@ class _ProductItemViewState extends State<ProductItemView> {
     List<Product> cartProducts = localPrefService.fetchCartItem();
     for (final product in cartProducts) {
       if (product.id == widget.product.id) {
+        productQuatity = product.quatity;
         return true;
       }
     }
@@ -94,7 +214,7 @@ class _ProductItemViewState extends State<ProductItemView> {
 
   @override
   void setState(VoidCallback fn) {
-    productInCart = !productInCart;
+    // productInCart = !productInCart;
     super.setState(fn);
   }
 }

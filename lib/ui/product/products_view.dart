@@ -1,26 +1,43 @@
 import 'package:ecommerce_app_demo/models/product.dart';
+import 'package:ecommerce_app_demo/services/local_preferences.dart';
 import 'package:ecommerce_app_demo/ui/product/product_item_view.dart';
+import 'package:ecommerce_app_demo/ui/shared/notification_badge.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
+import '../../bloc/product/product_bloc.dart';
 import '../../repositories/product_repository.dart';
+import '../../utils/app_text_style.dart';
 import '../cart/cart_view.dart';
 import '../shared/app_bar.dart';
 
 class ProductsView extends StatefulWidget {
-  const ProductsView({Key? key}) : super(key: key);
+  static final productsViewState = GlobalKey<ProductsViewState>();
+  ProductsView() : super(key: productsViewState);
 
   @override
-  State<ProductsView> createState() => _ProductsViewState();
+  State<ProductsView> createState() => ProductsViewState();
 }
 
-class _ProductsViewState extends State<ProductsView> {
+class ProductsViewState extends State<ProductsView> {
   List<Product> products = [];
+  List<Product> cartProducts = [];
+
+  final productBloc = ProductBloc();
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      initializeList();
+      //  final bloc = BlocProvider.of<ProductBloc>(context, listen: false);
+      // bloc.repository.getProducts();
+      productBloc.add(FetchProductEvents());
+      updateCartBadge();
     });
     super.initState();
+  }
+
+  void updateCartBadge() {
+    cartProducts = GetIt.I.get<LocalPrefService>().fetchCartItem();
   }
 
   Future<void> initializeList() async {
@@ -34,52 +51,60 @@ class _ProductsViewState extends State<ProductsView> {
       appBar: BaseAppBar(
         title: 'Shopping mall',
         actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const CartView(),
-                ),
-              );
-            },
-            focusColor: Colors.transparent,
-            icon: const Icon(
-              Icons.shopping_cart_outlined,
+          NotificationBadge(
+            count: cartProducts.length,
+            child: IconButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const CartView(),
+                  ),
+                );
+              },
+              focusColor: Colors.transparent,
+              icon: const Icon(
+                Icons.shopping_cart_outlined,
+              ),
             ),
           )
         ],
       ),
-      body: buildArticleList(products),
+      body:
 
-      /* BlocBuilder<ProductBloc, ProductState>(
-        builder: (BuildContext context, state) {
-          if (state is ProductInitialState) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is ProductLoadingState) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is ProductLoadedState) {
-            return buildArticleList(state.products);
-          } else if (state is ProductErrorState) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  state.message,
-                  style: AppTextStyle.poppins(
-                    color: Colors.red,
+          /*buildArticleList(products),*/
+
+          BlocListener<ProductBloc, ProductState>(
+        listener: (context, state) => setState(() {}),
+        child: BlocBuilder<ProductBloc, ProductState>(
+          builder: (BuildContext context, state) {
+            if (state is ProductInitialState) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (state is ProductLoadingState) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (state is ProductLoadedState) {
+              return buildArticleList(state.products);
+            } else if (state is ProductErrorState) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    state.message,
+                    style: AppTextStyle.poppins(
+                      color: Colors.red,
+                    ),
                   ),
                 ),
-              ),
-            );
-          } else {
-            return const SizedBox.shrink();
-          }
-        },
-      ),*/
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
+          },
+        ),
+      ),
     );
   }
 

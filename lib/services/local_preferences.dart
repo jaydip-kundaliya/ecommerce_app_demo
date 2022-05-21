@@ -24,15 +24,49 @@ class LocalPrefService {
     );
   }
 
+  Future<void> deleteProductToCart(Product product) async {
+    final List<Product> products = fetchCartItem();
+    final List<String> stringProducts = [];
+    for (final item in products) {
+      if (item.id != product.id) {
+        stringProducts.add(productToJson(item));
+      }
+    }
+    await prefs.setStringList(
+      LocalPrefKeys.cartProductsKey,
+      stringProducts,
+    );
+  }
+
   List<Product> fetchCartItem() {
     final List<Product> products = [];
-    final result = prefs.getStringList(
+    final List<String>? result = prefs.getStringList(
       LocalPrefKeys.cartProductsKey,
     );
-    for (final item in result ?? []) {
-      products.add(productFromJson(item));
+
+    if (result != null) {
+      final List<Product> resultList =
+          result.map((e) => productFromJson(e)).toList();
+      for (int index = 0; index < resultList.length; index++) {
+        final productCatch = resultList[index];
+        if (!_isDuplicate(products, productCatch)) {
+          products.add(productCatch);
+        } else {
+          final newProduct = productCatch.updateQuatity(productCatch.quatity);
+          products[index - 1] = newProduct;
+        }
+      }
     }
-    log('All cart Items: ${result.toString()}');
+    log('All cart Items: ${products.toString()}');
     return products;
+  }
+
+  bool _isDuplicate(List<Product> products, Product indexProduct) {
+    for (int index = 0; index < products.length; index++) {
+      if (products[index].id == indexProduct.id) {
+        return true;
+      }
+    }
+    return false;
   }
 }

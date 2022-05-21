@@ -1,20 +1,21 @@
-import 'package:ecommerce_app_demo/bloc/product/product_event.dart';
-import 'package:ecommerce_app_demo/bloc/product/product_state.dart';
 import 'package:ecommerce_app_demo/repositories/product_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ProductBloc extends Bloc<ProductEvent, ProductState> {
-  final ProductRepository repository;
+import '../../models/product.dart';
 
-  ProductBloc({
-    required this.repository,
-  }) : super(ProductInitialState()) {
+part 'product_state.dart';
+part 'product_event.dart';
+
+class ProductBloc extends Bloc<ProductEvent, ProductState> {
+  ProductBloc() : super(ProductInitialState()) {
     on<ProductEvent>((event, emit) async {
       try {
         emit(ProductInitialState());
         final mList = await ProductRepositoryImpl().getProducts();
         emit(ProductLoadedState(products: mList));
-      } catch (e) {}
+      } catch (e) {
+        print(e);
+      }
     });
   }
 }

@@ -12,9 +12,7 @@ class EcommerceApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (BuildContext context) {
-        return ProductBloc(
-          repository: ProductRepositoryImpl(),
-        );
+        return ProductBloc();
       },
       child: const AppContainer(),
     );
@@ -32,7 +30,7 @@ class AppContainer extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const ProductsView(),
+      home: ProductsView(),
     );
   }
 }

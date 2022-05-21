@@ -60,7 +60,7 @@ class CartItemView extends StatelessWidget {
                           style: AppTextStyle.poppins(),
                         ),
                         Text(
-                          '0' ?? '',
+                          '${product.quatity}',
                           style: AppTextStyle.poppins(),
                         ),
                       ],

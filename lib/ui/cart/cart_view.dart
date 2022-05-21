@@ -1,6 +1,7 @@
 import 'package:ecommerce_app_demo/models/product.dart';
 import 'package:ecommerce_app_demo/services/local_preferences.dart';
 import 'package:ecommerce_app_demo/ui/cart/cart_item_view.dart';
+import 'package:ecommerce_app_demo/utils/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -29,7 +30,17 @@ class _CartViewState extends State<CartView> {
       appBar: const BaseAppBar(
         title: 'My Cart',
       ),
-      body: buildCartProductList(),
+      body: cartProducts.isNotEmpty
+          ? buildCartProductList()
+          : Center(
+              child: Text(
+                'The Cart is Empty 😔',
+                style: AppTextStyle.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
     );
   }
 

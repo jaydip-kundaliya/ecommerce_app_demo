@@ -1,8 +1,6 @@
-import 'package:equatable/equatable.dart';
+part of 'product_bloc.dart';
 
-import '../../models/product.dart';
-
-abstract class ProductState extends Equatable {}
+abstract class ProductState {}
 
 class ProductInitialState extends ProductState {
   @override

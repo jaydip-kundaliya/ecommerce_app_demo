@@ -13,6 +13,7 @@ class Product {
     this.featuredImage,
     this.status,
     this.createdAt,
+    this.quatity = 0,
     this.inCart = false,
   });
 
@@ -24,6 +25,7 @@ class Product {
   String? featuredImage;
   String? status;
   String? createdAt;
+  int quatity = 0;
   bool inCart = false;
 
   Product.fromJson(dynamic json) {
@@ -35,6 +37,8 @@ class Product {
     featuredImage = json['featured_image'];
     status = json['status'];
     createdAt = json['created_at'];
+    inCart = json['in_cart'] ?? false;
+    quatity = json['quatity'] ?? 0;
   }
 
   Product copyWith({
@@ -67,6 +71,23 @@ class Product {
     map['featured_image'] = featuredImage;
     map['status'] = status;
     map['created_at'] = createdAt;
+    map['in_cart'] = inCart;
+    map['quatity'] = quatity;
     return map;
+  }
+
+  Product updateQuatity(int quatity) {
+    return Product(
+      createdAt: createdAt,
+      description: description,
+      featuredImage: featuredImage,
+      id: id,
+      inCart: true,
+      price: price,
+      quatity: quatity,
+      slug: slug,
+      status: status,
+      title: title,
+    );
   }
 }
