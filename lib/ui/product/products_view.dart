@@ -31,6 +31,7 @@ class ProductsViewState extends State<ProductsView> {
       //  final bloc = BlocProvider.of<ProductBloc>(context, listen: false);
       // bloc.repository.getProducts();
       productBloc.add(FetchProductEvents());
+      initializeList();
       updateCartBadge();
     });
     super.initState();
@@ -69,42 +70,40 @@ class ProductsViewState extends State<ProductsView> {
           )
         ],
       ),
-      body:
+      body: buildArticleList(products),
 
-          /*buildArticleList(products),*/
-
-          BlocListener<ProductBloc, ProductState>(
-        listener: (context, state) => setState(() {}),
-        child: BlocBuilder<ProductBloc, ProductState>(
-          builder: (BuildContext context, state) {
-            if (state is ProductInitialState) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (state is ProductLoadingState) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (state is ProductLoadedState) {
-              return buildArticleList(state.products);
-            } else if (state is ProductErrorState) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    state.message,
-                    style: AppTextStyle.poppins(
-                      color: Colors.red,
-                    ),
-                  ),
-                ),
-              );
-            } else {
-              return const SizedBox.shrink();
-            }
-          },
-        ),
-      ),
+      //     BlocListener<ProductBloc, ProductState>(
+      //   listener: (context, state) => setState(() {}),
+      //   child: BlocBuilder<ProductBloc, ProductState>(
+      //     builder: (BuildContext context, state) {
+      //       if (state is ProductInitialState) {
+      //         return const Center(
+      //           child: CircularProgressIndicator(),
+      //         );
+      //       } else if (state is ProductLoadingState) {
+      //         return const Center(
+      //           child: CircularProgressIndicator(),
+      //         );
+      //       } else if (state is ProductLoadedState) {
+      //         return buildArticleList(state.products);
+      //       } else if (state is ProductErrorState) {
+      //         return Center(
+      //           child: Padding(
+      //             padding: const EdgeInsets.all(8.0),
+      //             child: Text(
+      //               state.message,
+      //               style: AppTextStyle.poppins(
+      //                 color: Colors.red,
+      //               ),
+      //             ),
+      //           ),
+      //         );
+      //       } else {
+      //         return const SizedBox.shrink();
+      //       }
+      //     },
+      //   ),
+      // ),
     );
   }
 
